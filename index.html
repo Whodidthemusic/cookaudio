@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <title>COOK — MAKE FIRE.</title>
+  <meta name="description" content="Dive in. Produce, record, and mix without boundaries. Discover COOK, a digital audio workstation for Windows.">
+  <meta property="og:title" content="COOK — MAKE FIRE.">
+  <meta property="og:description" content="Dive in. Produce, record, and mix without boundaries.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/png" href="./assets/icon.png">
+  <link rel="preload" as="font" type="font/ttf" href="./assets/barlow-condensed-black.ttf" crossorigin>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="page">
+    <header>
+      <a class="brand" href="#main" aria-label="COOK home"><img src="./assets/icon.png" width="38" height="38" alt="">COOK</a>
+      <a class="nav-link" href="#features">Features</a>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="headline">
+        <div class="hero-copy">
+          <h1 id="headline"><span>MAKE</span> <span>FIRE.</span></h1>
+          <p class="intro">Dive in. Produce, record, and mix without boundaries.</p>
+          <a class="download" id="download" href="#windows-release">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M1 1h8v8H1zm10 0h8v8h-8zM1 11h8v8H1zm10 0h8v8h-8z"/></svg>
+            Download COOK for Windows
+          </a>
+          <div class="release" id="windows-release" tabindex="-1">
+            <p>The public Windows installer is coming soon.</p>
+            <a href="#download" class="return">Back to download</a>
+          </div>
+        </div>
+        <img class="hero-flame" src="./assets/cook-flame.png" width="1254" height="1254" fetchpriority="high" alt="" decoding="async">
+      </section>
+      <section class="features" id="features" aria-label="COOK features" tabindex="-1">
+        <article><h2>Produce</h2><p>Make beats. Chop samples, sequence drums, generate chords, and bend notes.</p></article>
+        <article><h2>Record</h2><p>Punch in, stack takes, and comp vocals in a familiar workflow.</p></article>
+        <article><h2>Mix</h2><p>Shape your sound with a console mixer and built-in effects.</p></article>
+      </section>
+    </main>
+    <footer><span class="indicator" aria-hidden="true"></span><p><strong>Coming soon — Multiplayer Mode.</strong> More on the way.</p></footer>
+  </div>
+  <dialog id="release-dialog" aria-labelledby="release-title" aria-describedby="release-status">
+    <form method="dialog">
+      <img src="./assets/icon.png" width="46" height="46" alt="">
+      <h2 id="release-title">COOK for Windows</h2>
+      <p id="release-status">The public Windows installer is coming soon.</p>
+      <button class="dismiss" autofocus>Close</button>
+    </form>
+  </dialog>
+  <script src="./download.js" defer></script>
+</body>
+</html>
