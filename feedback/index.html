@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <title>Feedback — COOK</title>
+  <meta name="description" content="Report a bug or request a feature for COOK.">
+  <link rel="icon" href="../assets/icon.png">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <div class="page">
+    <header>
+      <a class="brand" href="../" aria-label="COOK home"><img src="../assets/icon.png" width="38" height="38" alt="">COOK</a>
+      <a class="nav-link" href="../">Home</a>
+    </header>
+    <main id="main" class="feedback-page">
+      <h1>Feedback</h1>
+      <form class="feedback-form" action="https://formsubmit.co/b5789044589462013bdea8e21c611bc3" method="post">
+        <input type="hidden" name="_subject" value="COOK · Website feedback">
+        <input type="hidden" name="_next" value="https://cookaudio.app/feedback/thanks.html">
+        <input type="hidden" name="_template" value="table">
+        <div hidden><input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-label="Leave blank"></div>
+        <fieldset><legend>What are you sending?</legend>
+          <div class="type-options">
+            <label><input type="radio" name="Type" value="Bug report" checked> Bug report</label>
+            <label><input type="radio" name="Type" value="Feature request"> Feature request</label>
+          </div>
+        </fieldset>
+        <label for="summary">Title</label>
+        <input name="Title" id="summary" required maxlength="140" placeholder="A short summary">
+        <label for="details">Details</label>
+        <p class="field-help" id="details-hint">For bugs, tell us what you did and what happened. For features, tell us what you want to do.</p>
+        <textarea name="Details" id="details" required maxlength="6000" rows="5" aria-describedby="details-hint"></textarea>
+        <label for="email">Your email <span>(optional)</span></label>
+        <input name="email" id="email" type="email" maxlength="254" autocomplete="email" aria-describedby="reply-hint">
+        <p class="field-help" id="reply-hint">Include it if we can follow up.</p>
+        <button class="download" type="submit">Send feedback</button>
+        <p id="send-status" role="status" aria-live="polite"></p>
+        <p class="delivery-note">Sent to the COOK team via FormSubmit.</p>
+      </form>
+    </main>
+  </div>
+  <script src="./form.js" defer></script>
+</body>
+</html>

@@ -18,7 +18,10 @@
   <div class="page">
     <header>
       <a class="brand" href="#main" aria-label="COOK home"><img src="./assets/icon.png" width="38" height="38" alt="">COOK</a>
-      <a class="nav-link" href="#features">Features</a>
+      <nav class="header-links" aria-label="Main navigation">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="./feedback/">Feedback</a>
+      </nav>
     </header>
     <main id="main">
       <section class="hero" aria-labelledby="headline">
@@ -42,7 +45,10 @@
         <article><h2>Mix</h2><p>Shape your sound with a console mixer and built-in effects.</p></article>
       </section>
     </main>
-    <footer><span class="indicator" aria-hidden="true"></span><p><strong>Coming soon — Multiplayer Mode.</strong> More on the way.</p></footer>
+    <footer class="multiplayer">
+      <h2>MULTIPLAYER MODE <span class="beta">Beta</span></h2>
+      <p>Host a session or join by invite to make music together in COOK.</p>
+    </footer>
   </div>
   <dialog id="release-dialog" aria-labelledby="release-title" aria-describedby="release-status">
     <form method="dialog">
