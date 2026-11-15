@@ -64,3 +64,14 @@ dialog::backdrop{background:rgb(0 0 0/.76)}dialog h2{margin:10px 0;font-size:25p
 .delivery-note{margin-top:2px}
 #send-status:empty{display:none}
 .feedback-form button:disabled{opacity:.65;cursor:wait}
+.donate{border:1px solid #9b7745;color:#ffbd63;border-radius:3px;padding:0 14px}
+.donate:hover{background:#ffbd63;color:#101010;text-decoration:none}
+.release-note{margin-top:14px;font-size:14px;line-height:1.55;color:var(--muted)}
+#donate-dialog{text-align:center}
+#donate-dialog h2{margin-top:0}
+.qr{display:block;width:min(220px,70%);height:auto;margin:20px auto 12px;border-radius:5px}
+.cashtag{font-weight:800;font-size:22px;color:var(--ink)!important;letter-spacing:-.02em}
+.donate-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:20px}
+.donate-actions .download,.donate-actions .dismiss{min-height:44px;margin:0;font-size:15px;padding:9px 21px}
+.ghost{background:transparent;color:var(--ink);border-color:#585858}.ghost:hover{background:#262626}
+@media(max-width:680px){.release-note{grid-column:1/-1}.donate{padding:0 10px}}
