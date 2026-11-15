@@ -75,3 +75,8 @@ dialog::backdrop{background:rgb(0 0 0/.76)}dialog h2{margin:10px 0;font-size:25p
 .donate-actions .download,.donate-actions .dismiss{min-height:44px;margin:0;font-size:15px;padding:9px 21px}
 .ghost{background:transparent;color:var(--ink);border-color:#585858}.ghost:hover{background:#262626}
 @media(max-width:680px){.release-note{grid-column:1/-1}.donate{padding:0 10px}}
+/* Small line icons beside the section names */
+.features h2{display:flex;align-items:center;flex-wrap:wrap;gap:.08em .26em}
+.icons{display:inline-flex;align-items:center;gap:.16em;flex:none}
+.ico{width:.6em;height:.6em;flex:none;color:#dedddc}.ico .knob{fill:var(--bg)}
+.multiplayer .ico{width:.95em;height:.95em}
