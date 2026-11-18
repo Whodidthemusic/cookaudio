@@ -91,3 +91,24 @@ dialog::backdrop{background:rgb(0 0 0/.76)}dialog h2{margin:10px 0;font-size:25p
 .about p{margin-top:clamp(18px,1.8vw,30px);max-width:58ch;font-size:clamp(16px,1.22vw,21px);line-height:1.55;color:var(--muted);letter-spacing:-.017em}
 .about .about-offer{margin-top:12px;color:var(--ink);font-weight:600}
 .about .download{margin-top:clamp(20px,2vw,32px)}
+/* Full-window screenshot under the title */
+.shot-full{margin:0 0 clamp(30px,3.6vw,62px);border-radius:8px}
+/* Title block: COOK big, MAKE FIRE. smaller under it; download sits under the main screenshot */
+h1{line-height:.8}
+.tagline{font:900 clamp(44px,6.4vw,112px)/.9 var(--display);text-transform:uppercase;letter-spacing:-.02em;margin-top:clamp(10px,1.2vw,22px)}
+.hero .intro{margin-bottom:0}
+.shot-full{margin-bottom:clamp(18px,1.8vw,30px)}
+.cta{padding-bottom:clamp(30px,3.6vw,62px)}
+.promo{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:16px;font-weight:600;font-size:clamp(15px,1.1vw,18px);letter-spacing:-.017em}
+@media(max-width:680px){.tagline{grid-column:1;align-self:start;font-size:clamp(40px,11vw,64px);margin-top:8px}.hero .intro{margin-bottom:0}}
+/* Moving Black Friday banner across the top */
+.ticker{display:block;overflow:hidden;background:#ffbd63;color:#101010;text-decoration:none;white-space:nowrap}
+.ticker-track{display:flex;width:max-content;animation:ticker 72s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-half{display:flex;flex:none;align-items:center}
+.ticker span{padding:9px 0 8px 22px;font:900 clamp(17px,1.5vw,24px)/1 var(--display);text-transform:uppercase;letter-spacing:.04em}
+.ticker .dot{font-size:.42em}
+.ticker:focus-visible{outline-offset:-3px;outline-color:#101010}
+@keyframes ticker{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+#download{scroll-margin-top:24px}
