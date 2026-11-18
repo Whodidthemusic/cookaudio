@@ -1,13 +1,15 @@
-// The Donate link opens Cash App directly if dialogs are unavailable; otherwise it shows the QR code first.
-const donate = document.getElementById('donate');
+// The Donate links open Cash App directly if dialogs are unavailable; otherwise they show the QR code first.
+const donate = document.querySelectorAll('#donate, .donate-open');
 const sheet = document.getElementById('donate-dialog');
 
-if (donate && sheet && typeof sheet.showModal === 'function') {
-  donate.setAttribute('aria-haspopup', 'dialog');
-  donate.addEventListener('click', (event) => {
-    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) return;
-    event.preventDefault();
-    sheet.showModal();
+if (donate.length && sheet && typeof sheet.showModal === 'function') {
+  donate.forEach((link) => {
+    link.setAttribute('aria-haspopup', 'dialog');
+    link.addEventListener('click', (event) => {
+      if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) return;
+      event.preventDefault();
+      sheet.showModal();
+    });
   });
   sheet.addEventListener('click', (event) => {
     if (event.target === sheet) sheet.close();
