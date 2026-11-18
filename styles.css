@@ -67,6 +67,7 @@ dialog::backdrop{background:rgb(0 0 0/.76)}dialog h2{margin:10px 0;font-size:25p
 .donate{border:1px solid #9b7745;color:#ffbd63;border-radius:3px;padding:0 14px}
 .donate:hover{background:#ffbd63;color:#101010;text-decoration:none}
 .release-note{margin-top:14px;font-size:14px;line-height:1.55;color:var(--muted)}
+.release-note + .release-note{margin-top:2px}
 #donate-dialog{text-align:center}
 #donate-dialog h2{margin-top:0}
 .qr{display:block;width:min(220px,70%);height:auto;margin:20px auto 12px;border-radius:5px}
