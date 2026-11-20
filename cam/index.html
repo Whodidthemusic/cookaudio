@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e0f12">
+<title>CookCam phone camera</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #0e0f12; color: #e8e9ee; font: 16px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; padding: env(safe-area-inset-top) 16px calc(env(safe-area-inset-bottom) + 14px); }
+  header { display: flex; align-items: center; gap: 9px; padding: 14px 0 12px; font-weight: 800; letter-spacing: .2em; font-size: 13px; }
+  header i { width: 10px; height: 10px; border-radius: 50%; background: #ff3d3d; box-shadow: 0 0 10px #ff3d3d99; }
+  #view { flex: 1; min-height: 0; background: #08090b; border: 1px solid #22252d; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  video { width: 100%; height: 100%; object-fit: contain; }
+  video.front { transform: scaleX(-1); }
+  #hint { padding: 0 22px; text-align: center; color: #9aa0b0; }
+  #status { min-height: 44px; padding: 12px 2px 10px; color: #9aa0b0; font-size: 14px; }
+  #status.ok { color: #38d67a; } #status.bad { color: #ff7a7a; }
+  .row { display: flex; gap: 10px; }
+  button { flex: 1; font: inherit; font-weight: 700; color: #e8e9ee; background: #23262f; border: 1px solid #323641; border-radius: 12px; padding: 15px 10px; }
+  button.go { background: #ff3d3d; border-color: #ff3d3d; color: #fff; }
+  button:disabled { opacity: .45; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header><i></i>COOKCAM</header>
+<div id="view">
+  <p id="hint">This sends this phone's camera and microphone to CookCam on your computer. Nothing is recorded or kept on the phone or on the web.</p>
+  <video id="video" playsinline muted autoplay hidden></video>
+</div>
+<div id="status">Tap Start, then allow the camera and microphone.</div>
+<div class="row">
+  <button id="start" class="go">Start</button>
+  <button id="flip" hidden>Flip camera</button>
+  <button id="mic" hidden>Mic on</button>
+</div>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const local = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const query = new URLSearchParams(location.search);
+  // The room number comes after the # so it is never sent to the website itself.
+  const room = (/r=([0-9a-f]{32})/.exec(location.hash) || [])[1];
+  const server = (local && query.get('server')) || 'wss://rooms.cookaudio.app';
+  let ws = null, pc = null, stream = null, facing = 'user', micOn = true, hostHere = false, wanted = false, offerTimer = null, lock = null;
+
+  function say(text, kind) { $('status').textContent = text; $('status').className = kind || ''; }
+  if (!room) { say('This link is missing its code. Scan the QR code in CookCam again.', 'bad'); $('start').disabled = true; }
+
+  async function camera() {
+    const video = { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } };
+    const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+    const fresh = await navigator.mediaDevices.getUserMedia(stream ? { video } : { video, audio });
+    if (stream) { // switching camera: keep the microphone, swap the picture
+      const old = stream.getVideoTracks()[0], next = fresh.getVideoTracks()[0];
+      stream.removeTrack(old); old.stop(); stream.addTrack(next);
+      const sender = pc && pc.getSenders().find((s) => s.track && s.track.kind === 'video');
+      if (sender) await sender.replaceTrack(next);
+    } else stream = fresh;
+    $('video').srcObject = stream; $('video').hidden = false; $('hint').hidden = true;
+    $('video').className = facing === 'user' ? 'front' : '';
+  }
+
+  const send = (o) => { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); };
+
+  function hangUp() { clearInterval(offerTimer); if (pc) { try { pc.close(); } catch (e) {} pc = null; } }
+
+  async function call() {
+    hangUp();
+    if (!stream || !hostHere) return;
+    const mine = pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }] });
+    stream.getTracks().forEach((t) => mine.addTrack(t, stream));
+    mine.onicecandidate = (e) => { if (e.candidate) send({ t: 'ice', c: e.candidate }); };
+    mine.onconnectionstatechange = () => {
+      if (mine !== pc) return;
+      if (mine.connectionState === 'connected') {
+        clearInterval(offerTimer);
+        say('Connected. Keep this page open while you record.', 'ok');
+        const v = mine.getSenders().find((s) => s.track && s.track.kind === 'video');
+        if (v) { const p = v.getParameters(); if (p.encodings && p.encodings[0]) { p.encodings[0].maxBitrate = 8000000; v.setParameters(p).catch(() => {}); } }
+      } else if (mine.connectionState === 'failed' || mine.connectionState === 'disconnected') {
+        say('Lost the computer. Trying again… Make sure the phone and computer are on the same Wi-Fi.', 'bad');
+        setTimeout(() => { if (mine === pc) call(); }, 1500);
+      }
+    };
+    const offer = await mine.createOffer();
+    await mine.setLocalDescription(offer);
+    const ring = () => send({ t: 'offer', sdp: mine.localDescription.sdp });
+    ring();
+    offerTimer = setInterval(() => { if (mine === pc && mine.connectionState !== 'connected' && !mine.remoteDescription) ring(); }, 3000);
+    say('Calling CookCam…');
+  }
+
+  function link() {
+    if (!wanted) return;
+    ws = new WebSocket(`${server}/r/${room}?role=guest&v=1`);
+    let beat = null;
+    ws.onopen = () => { say('Waiting for CookCam on your computer…'); beat = setInterval(() => ws.readyState === 1 && ws.send('ping'), 20000); };
+    ws.onmessage = async (e) => {
+      const m = String(e.data);
+      if (m === 'pong') return;
+      if (m === '!host 1') { hostHere = true; call(); return; }
+      if (m === '!host 0') { hostHere = false; hangUp(); say('CookCam closed on the computer. Open it and this reconnects.'); return; }
+      if (m[0] === '!') return;
+      let d; try { d = JSON.parse(m); } catch (err) { return; }
+      try {
+        if (d.t === 'answer' && pc && !pc.remoteDescription) await pc.setRemoteDescription({ type: 'answer', sdp: d.sdp });
+        else if (d.t === 'ice' && pc && d.c) await pc.addIceCandidate(d.c);
+        else if (d.t === 'again') call();
+      } catch (err) { /* a stale message from an earlier call */ }
+    };
+    ws.onclose = (e) => {
+      clearInterval(beat); hostHere = false; hangUp();
+      if (!wanted) return;
+      say(e.code === 1006 || e.code === 1000 ? 'Open CookCam on your computer and choose Connect a phone. Trying again…' : 'Connection closed. Trying again…');
+      setTimeout(link, 2500);
+    };
+  }
+
+  async function awake() { try { if (navigator.wakeLock) lock = await navigator.wakeLock.request('screen'); } catch (e) {} }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && wanted) awake(); });
+
+  $('start').onclick = async () => {
+    $('start').disabled = true;
+    try { await camera(); } catch (e) {
+      say('The camera or microphone was blocked. Allow them for this page in your browser settings, then tap Start again.', 'bad');
+      $('start').disabled = false; return;
+    }
+    $('start').hidden = true; $('flip').hidden = false; $('mic').hidden = false;
+    wanted = true; awake(); link();
+  };
+  $('flip').onclick = async () => {
+    $('flip').disabled = true;
+    facing = facing === 'user' ? 'environment' : 'user';
+    try { await camera(); } catch (e) { facing = facing === 'user' ? 'environment' : 'user'; }
+    $('flip').disabled = false;
+  };
+  $('mic').onclick = () => {
+    micOn = !micOn;
+    stream.getAudioTracks().forEach((t) => { t.enabled = micOn; });
+    $('mic').textContent = micOn ? 'Mic on' : 'Mic off';
+  };
+  if (local && query.get('auto')) $('start').click();   // for testing on the developer's own machine only
+})();
+</script>
+</body>
+</html>
