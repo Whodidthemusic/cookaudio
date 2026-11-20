@@ -52,8 +52,8 @@
   if (!room) { say('This link is missing its code. Scan the QR code in CookCam again.', 'bad'); $('start').disabled = true; }
 
   async function camera() {
-    const video = { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: 30 } };
-    const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+    const video = { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } };
+    const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: true };
     const fresh = await navigator.mediaDevices.getUserMedia(stream ? { video } : { video, audio });
     if (stream) { // switching camera: keep the microphone, swap the picture
       const old = stream.getVideoTracks()[0], next = fresh.getVideoTracks()[0];
@@ -81,7 +81,7 @@
         clearInterval(offerTimer);
         say('Connected. Keep this page open while you record.', 'ok');
         const v = mine.getSenders().find((s) => s.track && s.track.kind === 'video');
-        if (v) { const p = v.getParameters(); if (p.encodings && p.encodings[0]) { p.encodings[0].maxBitrate = 8000000; v.setParameters(p).catch(() => {}); } }
+        if (v) { const p = v.getParameters(); if (p.encodings && p.encodings[0]) { p.encodings[0].maxBitrate = 4000000; v.setParameters(p).catch(() => {}); } }
       } else if (mine.connectionState === 'failed' || mine.connectionState === 'disconnected') {
         say('Lost the computer. Trying again… Make sure the phone and computer are on the same Wi-Fi.', 'bad');
         setTimeout(() => { if (mine === pc) call(); }, 1500);
