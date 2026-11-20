@@ -141,3 +141,6 @@ h1{line-height:.8}
 .credit{padding:0 0 28px;text-align:center;font-size:12px;letter-spacing:.04em;color:#8f8e8b}.credit a{text-decoration:none}.credit a:hover{text-decoration:underline;text-underline-offset:3px}
 /* Keep the top bar inside narrow phone screens */
 @media(max-width:480px){.header-links{gap:9px}.brand{letter-spacing:.18em;font-size:21px}.brand img{width:32px}.nav-link{letter-spacing:.06em}.donate{padding:0 8px}}
+/* Download counter under the button */
+.download-count{font-size:15px}.download-count strong{color:var(--ink);font-weight:750}
+.download-count[hidden]{display:none}
