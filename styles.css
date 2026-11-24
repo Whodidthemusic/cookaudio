@@ -144,3 +144,17 @@ h1{line-height:.8}
 /* Download counter under the button */
 .download-count{font-size:15px}.download-count strong{color:var(--ink);font-weight:750}
 .download-count[hidden]{display:none}
+
+/* COOKcam: its own section, in its own green-to-yellow */
+.cookcam{border-top:1px solid #72716d;padding:clamp(28px,3vw,52px) 0 clamp(30px,3.4vw,60px);scroll-margin-top:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:clamp(22px,3.2vw,60px);align-items:center}
+.cookcam h2{display:flex;align-items:center;gap:.22em;font:900 clamp(46px,6.4vw,112px)/.92 var(--display);letter-spacing:-.022em;text-transform:none}
+.cookcam h2 i{font-style:normal;color:#b7f02a}
+.cookcam-mark{width:.82em;height:.82em;flex:none}
+.cookcam-tag{margin-top:6px;font:900 clamp(28px,2.9vw,48px)/1 var(--display);text-transform:uppercase;letter-spacing:-.01em;color:#b7f02a}
+.cookcam-intro{margin-top:14px;max-width:46ch;font-size:clamp(18px,1.55vw,25px);line-height:1.5;color:#dedddc;letter-spacing:-.012em}
+.cookcam-list{list-style:none;margin:clamp(16px,1.6vw,26px) 0 0;padding:0;display:grid;gap:9px;font-size:clamp(15px,1.15vw,19px);line-height:1.45;color:#dedddc}
+.cookcam-list li{padding-left:1.3em;position:relative}
+.cookcam-list li::before{content:"";position:absolute;left:0;top:.5em;width:.5em;height:.5em;border-radius:50%;background:linear-gradient(45deg,#10c95c,#ffe53a)}
+.cookcam-list strong{color:var(--ink)}
+.cookcam-get{margin-top:clamp(18px,1.8vw,30px)}
+@media(max-width:820px){.cookcam{grid-template-columns:1fr;gap:18px}.cookcam .zoom{order:-1}.cookcam h2{font-size:clamp(44px,12vw,64px)}}
