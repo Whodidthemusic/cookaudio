@@ -12,6 +12,7 @@
   <link rel="icon" type="image/png" href="./assets/icon.png">
   <link rel="preload" as="font" type="font/ttf" href="./assets/barlow-condensed-black.ttf" crossorigin>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./live.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -48,9 +49,57 @@
         <p class="release-note">macOS version coming soon [Maybe]</p>
       </div>
       <section class="features" id="features" aria-label="COOK features" tabindex="-1">
-        <article><h2>Produce <span class="icons"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M9 13v6M15 13v6"/><path d="M7.5 5h3v8h-3zM13.5 5h3v8h-3z" fill="currentColor"/></svg><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><ellipse cx="12" cy="10" rx="8" ry="3"/><path d="M4 10v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V10"/><path d="M3.5 3l6 4.5M20.5 3l-6 4.5"/></svg></span></h2><p>Make beats. Chop samples, sequence drums, generate chords, and bend notes.</p><div class="shots"><img class="shot" src="./assets/shot-sequencer.webp" width="1400" height="424" loading="lazy" decoding="async" alt="The COOK step sequencer with kick, snare and hat rows"><img class="shot" src="./assets/shot-piano.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The COOK piano roll with bent notes and coloured expression curves"></div></article>
-        <article><h2>Record <span class="icons"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M8.5 21h7"/></svg></span></h2><p>Punch in, stack takes, and comp vocals in a familiar workflow.</p><div class="shots"><img class="shot" src="./assets/shot-record.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The COOK arrangement with recorded audio takes and patterns"></div></article>
-        <article><h2>Mix <span class="icons"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 4v16M12 4v16M18 4v16"/><rect class="knob" x="3.8" y="13" width="4.4" height="3.2" rx="1"/><rect class="knob" x="9.8" y="6.5" width="4.4" height="3.2" rx="1"/><rect class="knob" x="15.8" y="10.5" width="4.4" height="3.2" rx="1"/></svg></span></h2><p>Shape your sound with a console mixer and built-in effects.</p><div class="shots"><img class="shot" src="./assets/shot-mix.webp" width="1200" height="750" loading="lazy" decoding="async" alt="The COOK console mixer with VU meters and faders"></div></article>
+        <article><h2>Produce <span class="icons"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M9 13v6M15 13v6"/><path d="M7.5 5h3v8h-3zM13.5 5h3v8h-3z" fill="currentColor"/></svg><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><ellipse cx="12" cy="10" rx="8" ry="3"/><path d="M4 10v6.5c0 1.7 3.6 3 8 3s8-1.3 8-3V10"/><path d="M3.5 3l6 4.5M20.5 3l-6 4.5"/></svg></span></h2><p>Make beats. Chop samples, sequence drums, generate chords, and bend notes.</p><div class="shots"><p class="live-cap">Sequencer</p><div class="live" id="seq" data-owner="seq">
+      <div class="sq-bar">
+        <div class="sq-lcd"><span id="sqPat">01  PATTERN 1</span><span class="sq-chev"><button id="sqUp" aria-label="Next pattern">▲</button><button id="sqDn" aria-label="Previous pattern">▼</button></span></div>
+        <button class="sq-b" id="sqNew">New</button>
+        <span class="sq-b dead" aria-hidden="true">Clone</span>
+        <div class="sq-steps">STEPS <b>16</b></div>
+        <div class="sq-steps">SWING <b class="off">0%</b></div>
+        <span class="sq-b dead" aria-hidden="true">+ Sampler</span>
+        <span class="sq-b dead" aria-hidden="true">+ VST</span>
+        <button class="sq-b" id="sqRoll">ROLL</button>
+        <span class="sq-b ic dead " aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg></span>
+        <span class="sq-b ic dead act" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20l4-1L19 8l-3-3L5 16z"/><path d="M4 21h9"/></svg></span>
+        <span class="sq-b ic dead " aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="14" height="7" rx="2"/><path d="M18 7h2v6h-8v3"/><rect x="10.5" y="16" width="3" height="5" rx="1"/></svg></span>
+        <span class="sq-b ic dead " aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M17 4l3 3-3 3"/><path d="M20 7H9a5 5 0 000 10h8"/></svg></span>
+        <span class="sq-b ic dead" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 6v7M12 6v7M16 6v7"/></svg></span>
+        <span class="sq-b ic dead " aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 19v-6M10 19V8M14 19v-9M18 19V5"/></svg></span>
+      </div>
+      <div class="seq-rows" id="seqRows"></div>
+      <div class="sq-foot">
+        <span class="sp"><span class="pill" data-pill>Live</span> Click a pad to add a step, right-click to remove it</span>
+        <span class="tempo"><button class="btn" id="bpmDn" aria-label="Tempo down">−</button><span class="lcd" id="bpm">141</span><button class="btn" id="bpmUp" aria-label="Tempo up">+</button></span>
+        <button class="btn" id="seqClear">Clear</button>
+        <button class="btn snd" data-snd="seq">Sound</button>
+      </div>
+    </div><p class="live-cap">Piano Roll: click or drag to draw, right-click to delete. Bonded notes bend</p><div class="live" id="pr" data-owner="pr">
+      <div class="bar">
+        <span class="title">Piano Roll <span class="pill" data-pill>Live</span></span>
+        <button class="btn" id="prBond" aria-pressed="false" title="When on, a note you draw where another note ends is bonded to it and the sound bends into it">BOND</button>
+        <button class="btn" id="prClear">Clear</button>
+        <button class="btn snd" data-snd="pr">Sound</button>
+      </div>
+      <canvas id="prCv" aria-label="Live piano roll. Notes are added one at a time. Click to add your own."></canvas>
+    </div></div></article>
+        <article><h2>Record <span class="icons"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M8.5 21h7"/></svg></span></h2><p>Punch in, stack takes, and comp vocals in a familiar workflow.</p><div class="shots"><div class="live" id="hero" data-owner="hero">
+      <div class="bar">
+        <span class="title">Arrangement <span class="pill" data-pill>Live</span></span>
+        <span class="swatches" id="swatches" role="group" aria-label="Theme colour"></span>
+        <span class="jhint">(press <kbd>J</kbd> to punch in and out)</span>
+        <button class="btn rec" id="recBtn">● Record</button>
+        <button class="btn" id="addBtn">+ Track</button>
+        <button class="btn" id="resetBtn">Reset</button>
+      </div>
+      <canvas id="heroCv" aria-label="Live COOK arrangement: tracks are recorded, removed and recoloured. Click the × on a track to remove it."></canvas>
+    </div></div></article>
+        <article><h2>Mix <span class="icons"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 4v16M12 4v16M18 4v16"/><rect class="knob" x="3.8" y="13" width="4.4" height="3.2" rx="1"/><rect class="knob" x="9.8" y="6.5" width="4.4" height="3.2" rx="1"/><rect class="knob" x="15.8" y="10.5" width="4.4" height="3.2" rx="1"/></svg></span></h2><p>Shape your sound with a console mixer and built-in effects.</p><div class="shots"><p class="live-cap">These faders really turn the beat above up and down</p><div class="live" id="mix" data-owner="seq">
+      <div class="bar">
+        <span class="title">Mixer <span class="pill" data-pill>Live</span></span>
+        <button class="btn snd" data-snd="seq">Sound</button>
+      </div>
+      <div class="strips" id="strips"></div>
+    </div></div></article>
       </section>
       <section class="plugins" id="plugins" aria-labelledby="plugins-title" tabindex="-1">
         <h2 id="plugins-title">Comes loaded.</h2>
@@ -150,5 +199,6 @@
   </dialog>
   <script src="./donate.js" defer></script>
   <script src="./counter.js" defer></script>
+  <script src="./live.js" defer></script>
 </body>
 </html>
