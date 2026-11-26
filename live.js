@@ -259,6 +259,84 @@ const mix=(()=>{
       if(AC){const g=s.k==='master'?master:ch[s.k];g.gain.setTargetAtTime(s.v*s.v*1.25,AC.currentTime,.03)}})}
   return{frame}})();
 
+/* ---------- PLUGINS: moving keys, knobs and pads drawn over the real plugin pictures ---------- */
+const plugs=(()=>{
+  const NS='http://www.w3.org/2000/svg',WH=[0,2,4,5,7,9,11];
+  const E=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e};
+  // All positions are in pixels of the picture itself. knobs: [centre x, centre y, radius]. auto: [knob index, swing in degrees, speed].
+  // keys: white keys only; a and b are the left and right edges of the keyboard on the rows ya and yb (the keys fan out slightly towards the front).
+  const DEFS={
+    auntie:{W:1496,H:1137,col:'#ff5a3c',base:24,hint:'Play the keys, turn the knobs',voice:{type:'sawtooth',detune:.3,rel:.22},cut:14,res:8,
+      keys:{n:43,ya:1000,yb:1062,a:[238,1444],b:[230.5,1454],top:993,bot:1067},
+      knobs:[[535,309,24],[770,309,24],[841,309,24],[1140,322,36],[1240,322,28],[1328,322,28],[392,371,22],[459,373,22],[535,370,24],[392,433,22],[459,434,22],[533,433,24],
+             [635,417,24],[706,417,24],[1004,395,52],[776,417,24],[848,417,24],[1141,433,28],[1240,428,28],[1328,428,28],[131,587,24],[196,584,24],[260,584,24],[321,589,24],
+             [418,584,24],[482,584,24],[547,584,24],[610,584,24],[675,584,24],[867,584,22],[917,584,22],[971,589,22],[1021,584,22],[1216,584,22],[1285,584,22],[1354,587,22],
+             [149,769,30],[238,766,30],[331,765,30],[423,765,30],[517,769,30],[609,765,30],[735,765,30],[836,765,30],[1035,765,30],[1136,765,30],[1238,771,30],[1336,765,30]],
+      auto:[[14,62,.8],[3,40,.5],[15,35,1.1],[29,50,.35],[39,30,.6],[47,25,.45]],
+      seq:[7,-1,7,14,-1,12,9,-1,7,-1,7,11,-1,12,14,11, 5,-1,5,12,-1,11,9,-1,4,-1,4,11,-1,9,8,6]},
+    elixir:{W:1600,H:1006,col:'#ff4f9a',base:24,hint:'Play the keys, turn the knobs',voice:{type:'sawtooth',detune:.6,rel:.45},cut:4,res:5,
+      keys:{n:50,ya:840,yb:903,a:[265.1,1508.9],b:[257.8,1519.2],top:829,bot:908},
+      knobs:[[413,223,28],[506,223,28],[412,315,28],[506,315,28],[1186,177,32],[1438,176,32],[167,443,22],[267,442,22],[371,441,22],[476,442,22],[1382,386,30],
+             [421,595,22],[493,596,22],[566,596,22],[638,596,22],[710,596,22],[811,591,46],[1294,597,28]],
+      auto:[[4,60,.7],[5,35,.45],[16,70,.3],[0,40,.55],[14,45,.9],[10,50,1.3]],
+      seq:[21,23,25,28,25,23,21,-1,19,21,23,26,23,21,19,-1, 22,24,26,29,26,24,22,-1,20,22,24,27,28,27,24,-1]},
+    npc:{W:1600,H:1093,col:'#ffa63a',hint:'Hit the pads, turn the knobs',
+      pads:{x:[33,206,380,554],y:[740,556,372,188],w:170,h:162},   // rows listed from A01 (bottom) up
+      knobs:[[1397,153,43],[1397,292,43],[861,515,43],[1040,515,43],[1222,517,43]],
+      auto:[[2,55,.9],[3,40,.6],[4,65,.4],[0,20,.3]],
+      pat:{0:'x.....x...x.....',1:'....x.......x...',2:'x.x.x.xxx.x.x.x.',3:'x.........x.....',4:'...x..........x.',6:'.......x...x....',9:'......x......x..'}}
+  };
+  const list=[];
+  function padSound(i){if(i%4===0&&i<12)return drum.kick();if(i===3)return drum.bass();if(i===1||i===10)return drum.snare();if(i===2||i===9||i===11)return drum.hat();
+    tone([60,63,67,70,72,75,77,79,58,65,68,74][i%12]+(i>11?0:-12),.12,'synth',{type:'square',cut:.5,rel:.18,detune:.1})}
+  Object.keys(DEFS).forEach(name=>{
+    const D=DEFS[name],img=document.querySelector('.plugin-grid img[src*="plugin-'+name+'."]');if(!img)return;
+    const a=img.closest('a')||img.parentNode,id='plug-'+name;a.id=id;a.classList.add('plug');a.style.setProperty('--pc',D.col);io.observe(a);
+    const svg=E('svg',{viewBox:'0 0 '+D.W+' '+D.H,preserveAspectRatio:'none','class':'plug-svg','aria-hidden':'true'}),defs=E('defs',{});svg.appendChild(defs);
+    const P={id,D,svg,keys:[],pads:[],knobs:[],idleAt:0,step:-1,si:0,held:null};
+    // control row under the description: Live badge, hint, Sound button
+    const cap=a.parentNode.querySelector('figcaption');const ctl=document.createElement('div');ctl.className='plug-ctl';
+    ctl.innerHTML='<span class="pill">Live</span><span class="plug-hint"></span><button type="button" class="snd" data-snd="'+id+'">Sound</button>';
+    ctl.querySelector('.plug-hint').textContent=D.hint;P.pill=ctl.querySelector('.pill');(cap||a.parentNode).appendChild(ctl);
+    ctl.querySelector('.snd').addEventListener('click',()=>setSound(!(soundOn&&owner===id),id));
+    const touched=(s=10)=>{P.idleAt=now()+s;P.pill.textContent='You';P.pill.classList.add('you')};
+    P.idle=()=>{const ok=!REDUCED&&now()>P.idleAt;if(ok&&P.pill.classList.contains('you')){P.pill.textContent='Live';P.pill.classList.remove('you')}return ok};
+    a.addEventListener('pointerdown',()=>{if(soundOn&&owner!==id)setSound(true,id)});
+    svg.addEventListener('click',e=>{e.preventDefault();e.stopPropagation()});   // a click on a key, knob or pad must not open the full-size picture
+    // knobs: a round cut-out of the same picture, turned about the knob's centre, so the real knob appears to turn
+    D.knobs.forEach((k,i)=>{const cp=E('clipPath',{id:id+'-k'+i});cp.appendChild(E('circle',{cx:k[0],cy:k[1],r:k[2]}));defs.appendChild(cp);
+      const g=E('g',{}),hit=E('circle',{cx:k[0],cy:k[1],r:k[2]+4,'class':'plug-knob'});g.appendChild(hit);svg.appendChild(g);
+      const K={k,g,ang:0,man:0,im:null,dr:false};P.knobs.push(K);let y0,a0;
+      hit.addEventListener('pointerdown',e=>{e.preventDefault();hit.setPointerCapture(e.pointerId);K.dr=true;y0=e.clientY;a0=K.ang;touched()});
+      hit.addEventListener('pointermove',e=>{if(!K.dr)return;K.ang=clamp(a0+(y0-e.clientY)*1.6,-140,140);K.man=now()+10;touched()});
+      const up=()=>{K.dr=false};hit.addEventListener('pointerup',up);hit.addEventListener('pointercancel',up)});
+    function turn(K){if(!K.im){K.im=E('image',{href:img.currentSrc||img.src,width:D.W,height:D.H,'clip-path':'url(#'+id+'-k'+P.knobs.indexOf(K)+')',preserveAspectRatio:'none'});K.im.style.pointerEvents='none';K.g.insertBefore(K.im,K.g.firstChild)}
+      K.im.setAttribute('transform','rotate('+K.ang.toFixed(1)+' '+K.k[0]+' '+K.k[1]+')')}
+    P.turn=turn;
+    const val=i=>clamp(.5+P.knobs[i].ang/220,.05,1);
+    // white keys
+    if(D.keys){const k=D.keys,ex=(e,y)=>{const f=(y-k.ya)/(k.yb-k.ya);return e.map((v,j)=>k.a[j]+(k.b[j]-k.a[j])*f)},T=ex(k.a,k.top),B=ex(k.a,k.bot);
+      for(let i=0;i<k.n;i++){const xt=j=>T[0]+(T[1]-T[0])*j/k.n,xb=j=>B[0]+(B[1]-B[0])*j/k.n;
+        const p=E('polygon',{points:[xt(i)+1,k.top,xt(i+1)-1,k.top,xb(i+1)-1,k.bot,xb(i)+1,k.bot].map(v=>(+v).toFixed(1)).join(' '),'class':'plug-key'});p.dataset.k=i;svg.appendChild(p);P.keys.push(p)}
+      P.press=(i,user)=>{const p=P.keys[i];if(!p)return;p.classList.add('down');setTimeout(()=>p.classList.remove('down'),user?190:150);
+        if(can(id))tone(D.base+12*Math.floor(i/7)+WH[i%7],.17,'synth',Object.assign({cut:val(D.cut),res:val(D.res)*.6},D.voice))};
+      const pk=e=>{const el=document.elementFromPoint(e.clientX,e.clientY),i=el&&el.dataset&&el.dataset.k;if(i!=null&&+i!==P.held&&el.ownerSVGElement===svg){P.held=+i;P.press(+i,true);touched()}};
+      svg.addEventListener('pointerdown',e=>{if(e.target.classList.contains('plug-key')){e.preventDefault();P.down=true;P.held=null;pk(e)}});
+      svg.addEventListener('pointermove',e=>{if(P.down)pk(e)});
+      const up=()=>{P.down=false;P.held=null};window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up)}
+    // pads
+    if(D.pads){const g=D.pads;g.y.forEach((y,r)=>g.x.forEach((x,c)=>{const i=r*4+c,p=E('rect',{x:x+3,y:y+3,width:g.w-6,height:g.h-6,rx:12,'class':'plug-pad'});svg.appendChild(p);P.pads.push(p);
+        p.addEventListener('pointerdown',e=>{e.preventDefault();P.hit(i);touched()})}));
+      P.hit=i=>{const p=P.pads[i];p.classList.remove('hit');void p.getBoundingClientRect();p.classList.add('hit');setTimeout(()=>p.classList.remove('hit'),90);if(can(id))padSound(i)}}
+    a.appendChild(svg);list.push(P)});
+  function frame(t,dt){list.forEach(P=>{if(!vis[P.id])return;const D=P.D,idle=P.idle();
+    P.D.auto.forEach(([i,amp,sp],n)=>{const K=P.knobs[i];if(K.dr||t<K.man||REDUCED)return;K.ang+=(amp*Math.sin(t*sp+n*1.9)-K.ang)*Math.min(1,dt*3)});
+    P.knobs.forEach(K=>{if(K.im||Math.abs(K.ang)>.3){if(K.shown!==K.ang){P.turn(K);K.shown=K.ang}}});
+    if(!idle)return;
+    if(D.seq){const s=Math.floor(t*bpm/60*2);if(s!==P.step){P.step=s;const k=D.seq[P.si++%D.seq.length];if(k>=0)P.press(k,false)}}
+    if(D.pat){const s=Math.floor(t*bpm/60*4)%16;if(s!==P.step){P.step=s;for(const i in D.pat)if(D.pat[i][s]==='x')P.hit(+i)}}})}
+  return{frame}})();
+
 /* ---------- one loop for everything; only visible panels run ---------- */
 setTheme(0);let last=now();
 function loop(){const t=now(),dt=Math.min(.1,t-last);last=t;
@@ -266,6 +344,7 @@ function loop(){const t=now(),dt=Math.min(.1,t-last);last=t;
   if(vis.seq||vis.mix)seq.frame(t);
   if(vis.pr)pr.frame(t,dt);
   if(vis.mix)mix.frame(t,dt);
+  plugs.frame(t,dt);
   requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 })();
